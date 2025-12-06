@@ -1,0 +1,41 @@
+package com.vendas.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import com.vendas.modelos.Produto;
+import com.vendas.repository.ProdutoRepository;
+
+@Service
+public class ProdutoService {
+
+    @Autowired
+    private ProdutoRepository repository;
+
+    public Produto salvar(Produto p) {
+        return repository.save(p);
+    }
+
+    public List<Produto> listar() {
+        return repository.findAll();
+    }
+
+    public Produto buscar(Integer id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    public Produto atualizar(Integer id, Produto novo) {
+        Produto atual = buscar(id);
+        if (atual == null) return null;
+
+        atual.setNome(novo.getNome());
+        atual.setPreco(novo.getPreco());
+        atual.setDescricao(novo.getDescricao());
+
+        return repository.save(atual);
+    }
+
+    public void deletar(Integer id) {
+        repository.deleteById(id);
+    }
+}
