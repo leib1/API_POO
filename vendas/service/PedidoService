@@ -1,0 +1,66 @@
+package com.vendas.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+import com.vendas.modelos.Pedido;
+import com.vendas.modelos.Cliente;
+import com.vendas.modelos.Produto;
+
+import com.vendas.repository.PedidoRepository;
+import com.vendas.repository.ClienteRepository;
+import com.vendas.repository.ProdutoRepository;
+
+@Service
+public class PedidoService {
+
+    @Autowired
+    private PedidoRepository pedidoRepo;
+
+    @Autowired
+    private ClienteRepository clienteRepo;
+
+    @Autowired
+    private ProdutoRepository produtoRepo;
+
+    public Pedido salvar(Pedido p) {
+
+        Cliente c = clienteRepo.findById(p.getCliente().getId())
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        Produto prod = produtoRepo.findById(p.getProduto().getId())
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+        p.setCliente(c);
+        p.setProduto(prod);
+
+        return pedidoRepo.save(p);
+    }
+
+    public List<Pedido> listar() {
+        return pedidoRepo.findAll();
+    }
+
+    public Pedido buscar(Integer id) {
+        return pedidoRepo.findById(id).orElse(null);
+    }
+
+    public Pedido atualizar(Integer id, Pedido novo) {
+        Pedido atual = buscar(id);
+        if (atual == null) return null;
+
+        Cliente c = clienteRepo.findById(novo.getCliente().getId()).orElse(null);
+        Produto prod = produtoRepo.findById(novo.getProduto().getId()).orElse(null);
+
+        atual.setCliente(c);
+        atual.setProduto(prod);
+        atual.setDataPedido(novo.getDataPedido());
+
+        return pedidoRepo.save(atual);
+    }
+
+    public void deletar(Integer id) {
+        pedidoRepo.deleteById(id);
+    }
+}
